@@ -1,0 +1,61 @@
+1.
+wanted to automatically download pdfs from my university's course page
+
+2. found this article explaining how to do that:
+https://dementorwriter.medium.com/notesdownloader-use-web-scraping-to-download-all-pdfs-with-python-511ea9f55e48
+
+ 2.1 as an interesting tidbit, i found what og:title,
+     og:link, og:description mean:
+     https://ahrefs.com/blog/open-graph-meta-tags/
+3. found out that this article works only for websites that don't require login from the user
+
+ 3.1 tidbit: at first, I thought I needed to provide headers to the website, but apparently this was not the case. Nevertheless this led me to know more about headers here:
+https://ahrefs.com/blog/open-graph-meta-tags/
+also this article here made me know why using headers is useful when web scraping:
+https://laurapollop.medium.com/http-headers-what-you-should-know-when-scraping-ab39fedd4f3b
+(I read what was under these headers: Where Are They Used?, How They Help Improve Web Scraping)
+
+4. Then I searched how to scrape in websites that require login till i found this page on stackoverflow:
+https://stackoverflow.com/questions/11892729/how-to-log-in-to-a-website-using-pythons-requests-module
+
+5. but when I tried to send the username and password (using post()), I got this error:
+"Unable to get local issuer certificate when using requests in python"
+This bug took me about 3 hours to figure out.
+
+6. First, I thought the problem was from my computer based on most of the answers I found here:
+https://stackoverflow.com/questions/51925384/unable-to-get-local-issuer-certificate-when-using-requests-in-python
+
+7. until I found this comment which made me realize the problem was not from my side:
+https://stackoverflow.com/questions/52805115/certificate-verify-failed-unable-to-get-local-issuer-certificate
+
+8. When I checked if the university's website actually sends out all the certifications for verfications, i found out it didn't! It didn't send the intermediate certificate
+
+9. So I had two options:
+ 9.1 to download the certifi library and edit its files to add the intermeddiate certification after downloading it using help from these articles:
+
+https://support.kemptechnologies.com/hc/en-us/articles/115002427603-How-to-Download-an-Intermediate-Cert-From-Browser
+
+https://newbedev.com/unable-to-get-local-issuer-certificate-when-using-requests-in-python
+
+but what I assume here is that if I download these intermediate certifications and add them to the file of certifications that certifi library has, every user that i'll send this project to have to do the same, so I decided to go with option 2
+
+ 9.2 to set verify=false in every post and get request I write, but this will prevent the program from validating the website that I'm sending sensitive data to, which isn't recommended:
+https://stackoverflow.com/questions/41740361/is-it-safe-to-disable-ssl-certificate-verification-in-pythonss-requests-lib
+This means that the program will work but the user has to be careful that the website he is sending data to is secure (has lock icon that is left to the address bar)
+
+(interesting reading where the data could still be stolen but from the server side, not by a man in the middle attack:
+https://www.semrush.com/blog/https-a-modern-false-sense-of-security/
+)
+
+interesting tidbit:
+when using write,
+the pdf files are overwritten (if they existed).
+if you instead use wget.download(), suffix (1) will be added to the pdf and the old ones won't be overwritten
+
+
+questions:
+1. when using wget.download, the websites that i'm using have to be certified, or else the pdfs will download as 30kb only and won't be readable. Is there a work-around?
+2. why do I have to use the argument stream=True to be able to download pdfs?
+3. what does the argument allow_redirects=True do in .get()? example?
+4. why when using session.get(url).text it displays the html of the url, but if I write
+session.get(url).content it displays the html of the login page before the url?
